@@ -29,24 +29,63 @@
 //	IN THE SOFTWARE.
 //
 
-#import "Bee_Precompile.h"
-#import "Bee_UISignal.h"
-#import "Bee_UIStack.h"
+#import "ServiceLiveload_Border.h"
 
-@interface BeeUIStack (Popover)
+#if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
+#if (__ON__ == __BEE_DEVELOPMENT__)
 
-AS_SIGNAL( POPOVER_WILL_PRESENT )	// Popover将要显示
-AS_SIGNAL( POPOVER_DID_PRESENT )	// Popover已经显示
-AS_SIGNAL( POPOVER_WILL_DISMISS )	// Popover将要隐藏
-AS_SIGNAL( POPOVER_DID_DISMISSED )	// Popover已经隐藏
+#pragma mark -
 
-@property (nonatomic, retain) UIPopoverController *	popover;
+@implementation ServiceLiveload_Border
 
-- (void)presentPopoverForView:(UIView *)view
-                  contentSize:(CGSize)size
-                    direction:(UIPopoverArrowDirection)direction
-                     animated:(BOOL)animated;
+- (id)initWithFrame:(CGRect)frame
+{
+	self = [super initWithFrame:frame];
+	if ( self )
+	{
+		self.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.3f];
+		self.userInteractionEnabled = NO;
+		self.layer.borderWidth = 2.0f;
+		self.layer.borderColor = [UIColor yellowColor].CGColor;
+//		self.textAlignment = UITextAlignmentCenter;
+//		self.font = [UIFont boldSystemFontOfSize:12.0f];
+	}
+	return self;
+}
 
-- (void)dismissPopoverAnimated:(BOOL)animated;
+- (void)didMoveToSuperview
+{
+	[super didMoveToSuperview];
+	
+	self.layer.cornerRadius = self.superview.layer.cornerRadius;
+}
+
+- (void)startAnimation
+{
+	self.alpha = 1.0f;
+	
+	[UIView beginAnimations:nil context:nil];
+	[UIView setAnimationCurve:UIViewAnimationCurveLinear];
+	[UIView setAnimationDuration:1.0f];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDidStopSelector:@selector(didAppearingAnimationStopped)];
+	
+	self.alpha = 0.0f;
+
+	[UIView commitAnimations];
+}
+
+- (void)didAppearingAnimationStopped
+{
+	[self removeFromSuperview];
+}
+
+- (void)dealloc
+{
+	[super dealloc];
+}
 
 @end
+
+#endif	// #if (__ON__ == __BEE_DEVELOPMENT__)
+#endif	// #if (TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR)
